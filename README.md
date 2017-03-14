@@ -8,13 +8,11 @@ It is intended for use with the Polaris Integrated Library System (ILS).  The T-
 **DISCLAIMER:** 
 *This code is provided ‘as-is’ and you use it at your own risk.   We cannot be held responsible for any damage to your ILS or cleanup charges as a result of running this code.  Make sure you understand the SQL queries you are running and test extensively on your training environment first.* 
 
-Set up in Polaris/SQL Server:
+Set up in Polaris & SQL Server:
 ==============
 In Polaris, create an empty bibliographic record set to store the bib records you want to dedupe. 
 
-Run the following T-SQL scripts to set up the required tables and stored procedures: 
-* sql/1_create_tables.sql
-* sql/2_create_sp.sql
+In SQL Server Management Studio, run the T-SQL scripts in the sql directory to set up the [required tables](sql/1_create_tables.sql) and [stored procedures](sql/2_create_sp.sql). 
 
 Set up Python
 ==============
@@ -53,7 +51,7 @@ You can use the [config.toml](config.toml) file to set input and output options 
 If you want to test the sensitivity of your fuzzy match settings, try running the sample script:
 
     python sample.py
-    
+
 More information about the fuzzywuzzy library can be found at: http://chairnerd.seatgeek.com/fuzzywuzzy-fuzzy-string-matching-in-python/
 
 After setting your configuration settings (including pointing the script to the location of your data file) run it again:
