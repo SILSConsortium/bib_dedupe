@@ -1,37 +1,121 @@
 ---
 
-#These are settings f
-
-#the data file to be examined
-file: "sample_data/sample_set.csv"
-
-#used to name the output files created by the script (example: results/phase1_books_duplicates.csv)
-phase: "1"
-format: "books"
-
-#choose the size of your random sample for cataloguers to review.  Set to 0 to skip creating a random sample.
-random_sample_size: 5
+isbn:
+ record_set: 22531
+ data_file: 'data/polaris_data.csv'
 
 #bit options - set to 1 to compare these fields, 0 to ignore them
-isbn: 0
-tom: 1
-pubdate: 1
+#isbn is also used for UPC
+ isbn: 1
+ tom: 0
+ pubdate: 0 
+
+ #include null sets (set to 1 to compare ISBN or pubdate when available and skip when not available)
+ null_isbn: 1
+ null_pubdate: 1 
+
+ #match type - options: 0 = ignore, 1 = exact, 2 = similarity ratio, 3 = partial ratio, 4 = token set ratio
+ title_match: 2
+ author_match: 2
+ gmd_match: 4
+ notes_match: 0
+ series_match: 0
+ name_part_match: 0 
+
+ #fuzzy string rating cutoff - max 100
+ title_fuzz: 65
+ author_fuzz: 65
+ gmd_fuzz: 80
+ notes_fuzz: 60
+ series_fuzz: 60
+ name_part_fuzz: 60
+
+upc:
+ record_set: 30194
+ data_file: 'data/polaris_data.csv'
+
+#bit options - set to 1 to compare these fields, 0 to ignore them
+#isbn is also used for UPC
+ isbn: 1
+ tom: 0
+ pubdate: 0 
+
+ #include null sets (set to 1 to compare ISBN or pubdate when available and skip when not available)
+ null_isbn: 1
+ null_pubdate: 1 
+
+ #match type - options: 0 = ignore, 1 = exact, 2 = similarity ratio, 3 = partial ratio, 4 = token set ratio
+ title_match: 2
+ author_match: 2
+ gmd_match: 4
+ notes_match: 0
+ series_match: 0
+ name_part_match: 0 
+
+ #fuzzy string rating cutoff - max 100
+ title_fuzz: 65
+ author_fuzz: 65
+ gmd_fuzz: 80
+ notes_fuzz: 60
+ series_fuzz: 60
+ name_part_fuzz: 60
+
+title:
+ record_set: 22534
+ data_file: 'data/polaris_data.csv'
+
+#bit options - set to 1 to compare these fields, 0 to ignore them
+#isbn is also used for UPC
+ isbn: 1
+ tom: 0
+ pubdate: 0
 
 #include null sets (set to 1 to compare ISBN or pubdate when available and skip when not available)
-null_isbn: 0
-null_pubdate: 1
+ null_isbn: 1
+ null_pubdate: 1
 
 #match type - options: 0 = ignore, 1 = exact, 2 = similarity ratio, 3 = partial ratio, 4 = token set ratio
-title_match: 2
-author_match: 2
-gmd_match: 1
-notes_match: 0
-series_match: 0
+ title_match: 2
+ author_match: 2
+ gmd_match: 4
+ notes_match: 0
+ series_match: 0
+ name_part_match: 0
 
 #fuzzy string rating cutoff - max 100
-title_fuzz: 90
-author_fuzz: 90
-gmd_fuzz: 90
-notes_fuzz: 70
-series_fuzz: 70
+ title_fuzz: 90
+ author_fuzz: 90
+ gmd_fuzz: 80
+ notes_fuzz: 75
+ series_fuzz: 75
+ name_part_fuzz: 75
 
+sample:
+ record_set: 00000
+ data_file: 'sample_data/sample_set.csv'
+
+#bit options - set to 1 to compare these fields, 0 to ignore them
+#isbn is also used for UPC
+ isbn: 1
+ tom: 1
+ pubdate: 1
+
+#include null sets (set to 1 to compare ISBN or pubdate when available and skip when not available)
+ null_isbn: 1
+ null_pubdate: 1
+
+#match type - options: 0 = ignore, 1 = exact, 2 = similarity ratio, 3 = partial ratio, 4 = token set ratio
+ title_match: 2
+ author_match: 2
+ gmd_match: 4
+ notes_match: 0
+ series_match: 0
+ name_part_match: 0
+
+#fuzzy string rating cutoff - max 100
+ title_fuzz: 65
+ author_fuzz: 65
+ gmd_fuzz: 80
+ notes_fuzz: 60
+ series_fuzz: 60
+ name_part_fuzz: 60

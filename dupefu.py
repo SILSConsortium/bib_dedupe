@@ -1,18 +1,9 @@
 import csv
-import collections
-import time
 import re
 import string
-import time
 
 from fuzzywuzzy import fuzz
 from fuzzywuzzy import process
-
-
-#our includes
-from dupefu import *
-from identify import *
-
 
 #converts the bib fields to a dictionary for easy reading
 def bib_to_hash ( file ):
@@ -22,19 +13,35 @@ def bib_to_hash ( file ):
 	bibs = {}
 
 	for row in bibReader:
-
 		#primary identification fields		
-   		bibID = int(row[0])
+		bibID = int(row[0])
+		#print(bibID)
+
 		ISBN = str(row[15])
 		Pubdate260 = re.search('\d+', row[17])
 
 		MARCdate1 = re.findall('\d+', row[5])
 
-		authornotes = row[19].translate(string.maketrans("",""), string.punctuation).upper()
-		series = row[18].translate(string.maketrans("",""), string.punctuation).upper()
+		authornotes = row[19].replace('"','').upper()  #translate(string.maketrans("",""), string.punctuation).upper()
+		series = row[18].replace('"','').upper() 
+		volume_re = re.search('\d+', row[20])
+		remainder = row[21].replace('"','').upper() 
+		name_part = row[22].replace('"','').upper()
 
 		if Pubdate260:
 			MARCdate1.append(str(Pubdate260.group(0)))
+
+		if volume_re:
+			volume = int(volume_re.group(0))
+		else: 
+			volume = 0
+
+		tx = re.findall('\d+',row[1])
+
+		if tx:
+			title_num = "".join(tx)
+		else:
+			title_num = "0"
 
 		#create list of unique pubdates plus one
 		pubdate = list(set(MARCdate1))
@@ -53,8 +60,12 @@ def bib_to_hash ( file ):
 		row1.append(authornotes)
 		row1.append(series)
 
+		row1.append(volume)
+		row1.append(name_part)
+		row1.append(title_num)
+
 		#create dictionary
-		if bibs.has_key(bibID):
+		if bibID in bibs:
 			bibs[bibID][0].append(ISBN)
 
 		else:
@@ -148,7 +159,7 @@ def rate_bib( bib ):
 #this function is used to build the dictionary of dupes for weighting
 def add_or_insert_into_dictionary(dictionary, k, v):
 
-	if dictionary.has_key(k):
+	if k in dictionary:
 		dictionary[k].append(v)
 	else:
 		initial_value = [k,v]

@@ -7,22 +7,26 @@
 
 
 --first procedure
-
 USE [Polaris]
 GO
 
+/****** Object:  StoredProcedure [Polaris].[SILS_Cat_UpdateDupeBibsTable]    Script Date: 27/02/2018 4:44:47 PM ******/
 SET ANSI_NULLS ON
 GO
 
 SET QUOTED_IDENTIFIER ON
 GO
 
+-- =============================================
 CREATE PROCEDURE [Polaris].[SILS_Cat_UpdateDupeBibsTable]
 	@recordset int 
 AS
 BEGIN
 
 	SET NOCOUNT ON;
+	--22531 ISBN
+	--30194 UPC
+	--22534 TitleAuthor
 
 TRUNCATE TABLE Polaris.SILS_duplicates
 
@@ -34,7 +38,7 @@ on br.BibliographicRecordID = brs.BibliographicRecordID
 where brs.RecordSetID = @recordset
 
 update Polaris.Polaris.SILS_duplicates 
-set Tag008 = (select REPLACE(bsf.Data, ' ', '')
+set Tag008 = (select top 1 REPLACE(bsf.Data, ' ', '')
 from polaris.BibliographicTags bt (nolock)
 inner join polaris.BibRecordSets brs (nolock)
 on bt.BibliographicRecordID = brs.BibliographicRecordID
@@ -197,6 +201,42 @@ and bsf.Subfield = 'c'
 and brs.RecordSetID = @recordset
 and BibID = bt.BibliographicRecordID)
 
+update Polaris.Polaris.SILS_duplicates 
+set Tag245n = 
+(select min(bsf.Data) from Polaris.BibliographicTags bt (nolock)
+inner join polaris.BibRecordSets brs (nolock)
+on bt.BibliographicRecordID = brs.BibliographicRecordID
+inner join polaris.polaris.BibliographicSubfields bsf (nolock)
+on bt.BibliographicTagID = bsf.BibliographicTagID
+where bt.EffectiveTagNumber = 245
+and bsf.Subfield = 'n'
+and brs.RecordSetID = @recordset
+and BibID = bt.BibliographicRecordID)
+
+update Polaris.Polaris.SILS_duplicates 
+set Tag245b = 
+(select min(bsf.Data) from Polaris.BibliographicTags bt (nolock)
+inner join polaris.BibRecordSets brs (nolock)
+on bt.BibliographicRecordID = brs.BibliographicRecordID
+inner join polaris.polaris.BibliographicSubfields bsf (nolock)
+on bt.BibliographicTagID = bsf.BibliographicTagID
+where bt.EffectiveTagNumber = 245
+and bsf.Subfield = 'b'
+and brs.RecordSetID = @recordset
+and BibID = bt.BibliographicRecordID)
+
+update Polaris.Polaris.SILS_duplicates 
+set Tag245p = 
+(select min(bsf.Data) from Polaris.BibliographicTags bt (nolock)
+inner join polaris.BibRecordSets brs (nolock)
+on bt.BibliographicRecordID = brs.BibliographicRecordID
+inner join polaris.polaris.BibliographicSubfields bsf (nolock)
+on bt.BibliographicTagID = bsf.BibliographicTagID
+where bt.EffectiveTagNumber = 245
+and bsf.Subfield = 'p'
+and brs.RecordSetID = @recordset
+and BibID = bt.BibliographicRecordID)
+
 select bibID, 
 	 COALESCE(Title,'') as Title,
 	 COALESCE(Author,'none') as Author,
@@ -212,19 +252,28 @@ select bibID,
 	 COALESCE(TagMisc,0) as countMisc,
 	 (COALESCE(LEN(Tag300a),0) + COALESCE(LEN(Tag300b),0) + COALESCE(LEN(Tag300c),0)) as Tag300,
 	 COALESCE(LinkedItems,0) as LinkedItems,
-	 bi.ISBNString,
+	 CASE
+		WHEN @recordset = <insert your UPC record set here> then u.UPCNumber
+		ELSE bi.ISBNString
+	 END as sn,
 	 COALESCE(Tag008,'') as Tag008,
 	 COALESCE(PubDate260,'') as Pubdate260,
 	 '"' + COALESCE(Tag490,'') + '"' as Tag490,
-	 '"' + COALESCE(REPLACE(Tag245c,'"',''),'') + '"' as Tag245c
+	 '"' + COALESCE(REPLACE(Tag245c,'"',''),'') + '"' as Tag245c,
+	 '"' + COALESCE(REPLACE(Tag245n,'"',''),'') + '"' as Tag245n,
+	 '"' + COALESCE(REPLACE(Tag245b,'"',''),'') + '"' as Tag245b,
+	 '"' + COALESCE(REPLACE(Tag245p,'"',''),'') + '"' as Tag245p
 FROM Polaris.Polaris.SILS_duplicates
 left join Polaris.Polaris.BibliographicISBNIndex bi (nolock)
 on BibID = bi.BibliographicRecordID
+left join Polaris.Polaris.BibliographicUPCIndex u (nolock)
+on BibID = u.BibliographicRecordID
 
 END 
 
 
 GO
+
 
 --second procedure
 
@@ -292,7 +341,7 @@ DECLARE merge_cur CURSOR FOR
 --records to delete.  --set to 100 adjust to preference
 
 select top 100 BibID,DeletedID,@nOrganizationID,@nUserID,@nWorkstationID
-from Polaris.SILS_duplicate_processing dup (nolock)
+from Polaris.SILS_duplicate_results dup (nolock)
 inner join polaris.BibliographicRecords br1 (nolock)
 on dup.BibID = br1.BibliographicRecordID
 inner join polaris.BibliographicRecords br2 (nolock)

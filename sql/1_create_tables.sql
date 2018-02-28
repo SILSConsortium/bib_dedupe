@@ -49,7 +49,7 @@ GO
 SET QUOTED_IDENTIFIER ON
 GO
 
-CREATE TABLE [Polaris].[SILS_duplicate_processing] (
+CREATE TABLE [Polaris].[SILS_duplicate_results] (
 	[BibID] [int] NULL,
 	[DeletedID] [int] NULL
 ) ON [PRIMARY]
